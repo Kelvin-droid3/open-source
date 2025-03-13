@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Quotes</title>
+</head>
+<body>
+    <h1>Welcome to the Random Quotes Generator!</h1>
+    <button onclick="getRandomQuote()">Get Random Quote</button>
+    <p id="quote">Your quote will appear here!</p>
+
+    <script>
+        function getRandomQuote() {
+            fetch('http://localhost:3000/random')  <!-- Make sure it's pointing to port 3000 -->
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); 
+                    document.getElementById('quote').textContent = `"${data.quote}" - ${data.author}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('quote').textContent = 'Error loading quote!';
+                });
+        }
+    </script>
+</body>
+</html>
