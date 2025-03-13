@@ -1,0 +1,42 @@
+const express = require('express');
+const fs = require('fs');
+const app = express();
+const PORT = 3000;
+
+// Load quotes from a JSON file with error handling
+let quotes = [];
+try {
+    const data = fs.readFileSync('quotes.json', 'utf8');
+    quotes = JSON.parse(data);
+} catch (error) {
+    console.error('Error loading quotes:', error);
+}
+
+// Extract available categories
+const availableCategories = [...new Set(quotes.map(q => q.category.toLowerCase()))];
+
+// Get a random quote
+app.get('/random', (req, res) => {
+    if (quotes.length === 0) {
+        return res.status(500).json({ error: 'No quotes available' });
+    }
+    const randomIndex = quotes.length > 0 ? Math.floor(Math.random() * quotes.length) : 0;
+    res.json(quotes[randomIndex]);
+});
+
+// Get a random quote by category
+app.get('/random/:category', (req, res) => {
+    const category = req.params.category.toLowerCase();
+    
+    if (!availableCategories.includes(category)) {
+        return res.status(404).json({ error: 'Invalid category. Available categories: ' + availableCategories.join(', ') });
+    }
+    
+    const filteredQuotes = quotes.filter(q => q.category.toLowerCase() === category);
+    const randomIndex = filteredQuotes.length > 0 ? Math.floor(Math.random() * filteredQuotes.length) : 0;
+    res.json(filteredQuotes[randomIndex]);
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
