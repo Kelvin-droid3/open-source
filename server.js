@@ -2,6 +2,10 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 const PORT = 3000;
+const cors = require('cors')
+
+// Enable CORS for all origins 
+app.use(cors());
 
 // Load quotes from a JSON file with error handling
 let quotes = [];
@@ -14,6 +18,9 @@ try {
 
 // Extract available categories
 const availableCategories = [...new Set(quotes.map(q => q.category.toLowerCase()))];
+
+// Serve static files (HTML, CSS, JS)
+app.use(express.static('public'));
 
 // Get a random quote
 app.get('/random', (req, res) => {
