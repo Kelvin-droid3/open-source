@@ -1,5 +1,3 @@
-node_modules/
-(OG Server.js)
 const express = require('express');
 const fs = require('fs');
 const app = express();
@@ -42,11 +40,3 @@ app.get('/random/:category', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-(OG quotes.json)
-
-[
-    { "quote": "Believe in yourself.", "author": "Unknown", "category": "motivational" },
-    { "quote": "To know oneself is to study oneself in action with another person.", "author": "Bruce Lee", "category": "inspirational" },
-    { "quote": "Power comes in response to a need, not a desire.", "author": "Goku", "category": "anime" }
-]
