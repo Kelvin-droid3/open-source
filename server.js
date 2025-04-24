@@ -2,12 +2,11 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 const PORT = 3000;
-const cors = require('cors')
+const cors = require('cors');
 
-// Enable CORS for all origins 
 app.use(cors());
+app.use(express.static('public'));
 
-// Load quotes from a JSON file with error handling
 let quotes = [];
 try {
     const data = fs.readFileSync('quotes.json', 'utf8');
@@ -16,32 +15,51 @@ try {
     console.error('Error loading quotes:', error);
 }
 
-// Extract available categories
-const availableCategories = [...new Set(quotes.map(q => q.category.toLowerCase()))];
+const availableLanguages = ['en', 'es', 'fr', 'ja', 'ga'];
 
-// Serve static files (HTML, CSS, JS)
-app.use(express.static('public'));
+app.get('/random/:lang?', (req, res) => {
+    const lang = req.params.lang || 'en';
+    
+    if (!availableLanguages.includes(lang)) {
+        return res.status(400).json({ error: 'Unsupported language' });
+    }
 
-// Get a random quote
-app.get('/random', (req, res) => {
     if (quotes.length === 0) {
         return res.status(500).json({ error: 'No quotes available' });
     }
-    const randomIndex = quotes.length > 0 ? Math.floor(Math.random() * quotes.length) : 0;
-    res.json(quotes[randomIndex]);
+
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    const quote = quotes[randomIndex][lang] || quotes[randomIndex]['en'];
+    res.json(quote);
 });
 
-// Get a random quote by category
-app.get('/random/:category', (req, res) => {
+app.get('/random/:lang/:category', (req, res) => {
+    const lang = req.params.lang || 'en';
     const category = req.params.category.toLowerCase();
-    
-    if (!availableCategories.includes(category)) {
-        return res.status(404).json({ error: 'Invalid category. Available categories: ' + availableCategories.join(', ') });
+
+    if (!availableLanguages.includes(lang)) {
+        return res.status(400).json({ error: 'Unsupported language' });
     }
-    
-    const filteredQuotes = quotes.filter(q => q.category.toLowerCase() === category);
-    const randomIndex = filteredQuotes.length > 0 ? Math.floor(Math.random() * filteredQuotes.length) : 0;
+
+    const filteredQuotes = quotes
+        .map(q => q[lang] || q['en'])
+        .filter(q => q.category.toLowerCase() === category);
+
+    if (filteredQuotes.length === 0) {
+        const categories = [...new Set(quotes.map(q => (q[lang] || q['en']).category.toLowerCase()))];
+        return res.status(404).json({ 
+            error: `Invalid category. Available categories: ${categories.join(', ')}` 
+        });
+    }
+
+    const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
     res.json(filteredQuotes[randomIndex]);
+});
+
+app.get('/categories/:lang?', (req, res) => {
+    const lang = req.params.lang || 'en';
+    const categories = [...new Set(quotes.map(q => (q[lang] || q['en']).category))];
+    res.json(categories);
 });
 
 app.listen(PORT, () => {
