@@ -85,5 +85,19 @@
   </div>
 
   <script src="script.js"></script>
+    <script>
+        function getRandomQuote() {
+            fetch('http://localhost:3000/random')  <!-- Make sure its pointing to port 3000 -->
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); 
+                    document.getElementById('quote').textContent = `"${data.quote}" - ${data.author}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('quote').textContent = 'Error loading quote!';
+                });
+        }
+    </script>
 </body>
 </html>
