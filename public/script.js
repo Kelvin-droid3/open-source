@@ -12,6 +12,7 @@ const favoritesLinkEl = document.getElementById('favoritesLink');
 const favoritesModalEl = document.getElementById('favoritesModal');
 const closeModalBtn = document.querySelector('.close-modal');
 const favoritesListEl = document.getElementById('favoritesList');
+const categorySelectEl = document.getElementById('categorySelect');
 
 // State
 let quotes = [
@@ -146,6 +147,7 @@ let quotes = [
 ];
 let currentQuote = {};
 let currentLang = 'en';
+let currentCategory = 'all'; // New state variable
 let isFavorite = false;
 
 // Initialize
@@ -159,6 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedLang = localStorage.getItem('lang') || 'en';
     currentLang = savedLang;
     langSelectEl.value = savedLang;
+
+    // Load category preference
+    const savedCategory = localStorage.getItem('category') || 'all';
+    currentCategory = savedCategory;
+    
+    // Initialize categories dropdown
+    populateCategories();
     
     // Load initial quote
     generateQuote();
@@ -166,6 +175,46 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set up event listeners
     setupEventListeners();
 });
+
+
+//function to populate categories dropdown
+function populateCategories() {
+    const categories = new Set();
+    quotes.forEach(quote => {
+        if (quote.category) {
+            categories.add(quote.category);
+        }
+    });
+    
+    // Sort categories alphabetically
+    const sortedCategories = Array.from(categories).sort();
+    
+    categorySelectEl.innerHTML = `
+        <option value="all">All Categories</option>
+        ${sortedCategories.map(cat => 
+            `<option value="${cat}" ${currentCategory === cat ? 'selected' : ''}>
+                ${cat.charAt(0).toUpperCase() + cat.slice(1)}
+            </option>`
+        ).join('')}
+    `;
+}
+
+// function to get filtered quotes by category
+function getFilteredQuotes() {
+    if (currentCategory === 'all') {
+        return quotes;
+    }
+    return quotes.filter(quote => quote.category === currentCategory);
+}
+
+// Modified generateQuote function to use filtered quotes
+function generateQuote() {
+    const filteredQuotes = getFilteredQuotes();
+    if (filteredQuotes.length === 0) {
+        showErrorState('No quotes available in this category');
+        return;
+    }
+}
 
 // Generate random quote
 function generateQuote() {
@@ -190,6 +239,8 @@ function updateDisplay() {
     const quoteText = currentQuote.text?.[currentLang] || currentQuote.text?.en || 'Quote not available';
     const author = currentQuote.author || 'Unknown';
     const image = currentQuote.image || '';
+    const title = currentQuote.Title ? ` (${currentQuote.Title})` : '';
+    const category = currentQuote.category ? ` - ${currentQuote.category.charAt(0).toUpperCase() + currentQuote.category.slice(1)}` : '';
     
     quoteTextEl.textContent = quoteText;
     quoteAuthorEl.textContent = `— ${author}`;
@@ -387,6 +438,11 @@ function setupEventListeners() {
     themeToggleBtn.addEventListener('click', toggleTheme);
     favoritesLinkEl.addEventListener('click', toggleFavoritesModal);
     closeModalBtn.addEventListener('click', toggleFavoritesModal);
+    categorySelectEl.addEventListener('change', (e) => {
+        currentCategory = e.target.value;
+        localStorage.setItem('category', currentCategory);
+        generateQuote();
+    });
     
     // Close modal when clicking outside
     favoritesModalEl.addEventListener('click', (e) => {
@@ -402,3 +458,4 @@ function setupEventListeners() {
         }
     });
 }
+
