@@ -1,15 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Quotes</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quotes R Us</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <h1>Welcome to the Random Quotes Generator!</h1>
-    <button onclick="getRandomQuote()">Get Random Quote</button>
-    <p id="quote">Your quote will appear here!</p>
+  <header>
+    <div class="header-container">
+      <h1 class="logo">
+        <i class="fas fa-quote-left"></i> Quotes R Us
+      </h1>
+      <div class="header-controls">
+        <div class="language-selector">
+          <label for="langSelect" class="sr-only">Language</label>
+          <select id="langSelect" class="styled-select">
+            <option value="en">🇬🇧 English</option>
+            <option value="ja">🇯🇵 日本語</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="ga">🇮🇪 Gaeilge</option>
+          </select>
+        </div>
+        <button id="themeToggle" class="theme-toggle">
+          <i class="fas fa-moon"></i> Dark Mode
+        </button>
+      </div>
+    </div>
+  </header>
 
+  <main class="main-container">
+    <div class="quote-card">
+      <div class="quote-image-container">
+        <img id="quoteImage" alt="Quote illustration" class="quote-image" loading="lazy">
+      </div>
+      
+      <div class="quote-content">
+        <div class="quote-text">
+          <i class="fas fa-quote-left quote-icon"></i>
+          <p id="quoteText">Loading inspirational quote...</p>
+        </div>
+        <p id="quoteAuthor" class="quote-author">— Author</p>
+      </div>
+
+      <div class="quote-actions">
+        <button id="newQuote" class="action-btn primary">
+          <i class="fas fa-sync-alt"></i> New Quote
+        </button>
+        <button id="favoriteBtn" class="action-btn secondary">
+          <i class="far fa-heart"></i> Favorite
+        </button>
+        <div class="action-group">
+          <button id="copyBtn" class="action-btn icon" title="Copy quote">
+            <i class="far fa-copy"></i>
+          </button>
+          <button id="shareBtn" class="action-btn icon" title="Share quote">
+            <i class="fas fa-share-alt"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <button id="favoritesLink" class="favorites-link">
+      <i class="fas fa-star"></i> View Favorites
+    </button>
+  </main>
+
+  <!-- Favorites Modal -->
+  <div id="favoritesModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="favoritesTitle">
+          <i class="fas fa-star"></i> Your Favorite Quotes
+        </h2>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div id="favoritesList" class="favorites-grid"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
     <script>
         function getRandomQuote() {
             fetch('http://localhost:3000/random')  <!-- Make sure its pointing to port 3000 -->
