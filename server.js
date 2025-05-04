@@ -10,23 +10,17 @@ const db = new Database('db/quotes.db');
 // Enable CORS for all origins
 app.use(cors());
 
-// Initialise database connection
-app.use((req, res, next) => {
-    req.db = db;
-    next();
-});
-
-// Precompute available categories at startup
-let availableCategories = [];
+// Precompute available tags at startup
+let availableTags = [];
 let totalQuotes = 0;
 
 try {
-    availableCategories = db.prepare(`
-        SELECT DISTINCT LOWER(category) as category 
-        FROM quotes
-    `).all().map(row => row.category);
+    // Get all unique tags
+    availableTags = db.prepare(`
+        SELECT name FROM tags ORDER BY name
+    `).all().map(row => row.name);
     
-    totalQuotes = db.prepare('SELECT COUNT(*) as total FROM quotes').get().total;
+    totalQuotes = db.prepare('SELECT COUNT(*) FROM quotes').pluck().get();
 } catch (error) {
     console.error('Database initialisation error:', error);
     process.exit(1);
@@ -39,44 +33,80 @@ app.use(express.static('public'));
 app.get('/random', (req, res) => {
     try {
         const stmt = db.prepare(`
-            SELECT * FROM quotes 
+            SELECT 
+                q.quote, 
+                q.author,
+                JSON_GROUP_ARRAY(t.name) AS tags
+            FROM quotes q
+            LEFT JOIN quote_tags qt ON q.id = qt.quote_id
+            LEFT JOIN tags t ON qt.tag_id = t.id
+            GROUP BY q.id
             LIMIT 1 OFFSET ABS(RANDOM() % ?)
         `);
+        
         const quote = stmt.get(totalQuotes);
+        quote.tags = JSON.parse(quote.tags || '[]'); // Convert JSON string to array
+        
         quote ? res.json(quote) : res.status(404).json({ error: 'No quotes found' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch random quote' });
     }
 });
 
-// Get random quote by category endpoint
-app.get('/random/:category', (req, res) => {
-    const category = req.params.category.toLowerCase();
+// Get random quote by tag endpoint
+app.get('/random/tag/:tag', (req, res) => {
+    const requestedTag = req.params.tag.toLowerCase();
     
-    if (!availableCategories.includes(category)) {
+    if (!availableTags.includes(requestedTag)) {
         return res.status(400).json({
-            error: 'Invalid category',
-            availableCategories: availableCategories.join(', ')
+            error: 'Invalid tag requested',
+            availableTags: availableTags,
+            suggestion: 'Use exact tag name from /tags endpoint'
         });
     }
 
     try {
         const stmt = db.prepare(`
-            SELECT * FROM quotes 
-            WHERE LOWER(category) = ? 
+            SELECT 
+                q.quote,
+                q.author,
+                JSON_GROUP_ARRAY(t.name) AS tags
+            FROM quotes q
+            JOIN quote_tags qt ON q.id = qt.quote_id
+            JOIN tags t ON qt.tag_id = t.id
+            WHERE t.name = ?
+            GROUP BY q.id
             LIMIT 1 OFFSET ABS(RANDOM() % (
-                SELECT COUNT(*) FROM quotes WHERE LOWER(category) = ?
+                SELECT COUNT(DISTINCT q.id)
+                FROM quotes q
+                JOIN quote_tags qt ON q.id = qt.quote_id
+                JOIN tags t ON qt.tag_id = t.id
+                WHERE t.name = ?
             ))
         `);
-        const quote = stmt.get(category, category);
-        quote ? res.json(quote) : res.status(404).json({ error: 'No quotes found' });
+
+        const quote = stmt.get(requestedTag, requestedTag);
+        if (quote) {
+            quote.tags = JSON.parse(quote.tags);
+            res.json(quote);
+        } else {
+            res.status(404).json({ error: 'No quotes found for tag' });
+        }
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch category quote' });
+        res.status(500).json({ error: 'Failed to fetch tagged quote' });
     }
+});
+
+// Get all available tags
+app.get('/tags', (req, res) => {
+    res.json({
+        count: availableTags.length,
+        tags: availableTags
+    });
 });
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Total quotes available: ${totalQuotes}`);
-    console.log(`Available categories: ${availableCategories.join(', ')}`);
+    console.log(`Available tags (${availableTags.length}):\n- ${availableTags.join('\n- ')}`);
 });
