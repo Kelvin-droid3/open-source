@@ -9,3 +9,4 @@ Thank you for your interest in contributing to this project! We welcome all kind
    ```bash
    git clone https://github.com/Kelvin-droid3/open-source.git
    ```
+3. You are ready to go!
