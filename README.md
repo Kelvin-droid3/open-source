@@ -1,7 +1,7 @@
-Open Source Project - Quotes R US
+Open Source Project - Quotes R Us
 
 This project is a basic website made with **HTML**, **CSS**, and **JavaScript**.  
-It was created as part of a school module group project.
+It was created as part of a college module group project.
 
 ---
 
@@ -40,7 +40,7 @@ The goal is to practice and demonstrate teamwork, version control, and UI design
 
 👨‍💻 Team Members
 Kelvin (@Kelvin-droid3)
-Luke (@)
+Luke (@empafee)
 Mike(@)
 
 📸 Screenshot
