@@ -1,152 +1,78 @@
-<<<<<<< HEAD:quotes.json
+
 [
     {
-      "text": {
-        "en": "Believe in yourself.",
-        "ja": "自分を信じて。",
-        "fr": "Crois en toi.",
-        "es": "Cree en ti mismo.",
-        "ga": "Creid i dfhéin."
-      },
+      "quote": "Believe in yourself.",
       "author": "Unknown",
-      "category": "motivational",
-      "image": "images/0.jpg"
+      "tags": ["inspirational", "motivational"]
     },
     {
-      "text": {
-        "en": "To know oneself is to study oneself in action with another person.",
-        "ja": "自分を知るとは、他人との関わりの中で自分を観察することだ。",
-        "fr": "Se connaître, cest sétudier en action avec une autre personne.",
-        "es": "Conocerse es estudiarse en acción con otra persona.",
-        "ga": "Is é féinfhios a bheith ag staidéar ort féin le duine eile."
-      },
+      "quote": "To know oneself is to study oneself in action with another person.",
       "author": "Bruce Lee",
-      "category": "inspirational",
-      "image": "images/1.jpg"
+      "tags": ["wisdom", "philosophy"]
     },
     {
-      "text": {
-        "en": "Power comes in response to a need, not a desire.",
-        "ja": "力は欲望ではなく必要に応じて現れる。",
-        "fr": "Le pouvoir vient en réponse à un besoin, pas à un désir.",
-        "es": "El poder surge en respuesta a una necesidad, no a un deseo.",
-        "ga": "Tagann cumhacht mar fhreagra ar riachtanas, ní ar mhian."
-      },
+      "quote": "Power comes in response to a need, not a desire.",
       "author": "Goku",
-      "category": "anime",
-      "Title": "Dragonball",
-      "image": "images/2.jpg"
+      "tags": ["anime"]
     },
     {
-      "text": {
-        "en": "Just keep swimming.",
-        "ja": "とにかく泳ぎ続けて。",
-        "fr": "Continue à nager.",
-        "es": "Sigue nadando.",
-        "ga": "Lean ort ag snámh."
-      },
+      "quote": "Just keep swimming.",
       "author": "Dory",
-      "category": "movie",
-      "Title": "Finding Nemo",
-      "image": "images/3.jpg"
+      "tags": ["inspirational", "movie"]
     },
     {
-      "text": {
-        "en": "Why so serious?",
-        "ja": "そんなに真剣になるな。",
-        "fr": "Pourquoi si sérieux ?",
-        "es": "¿Por qué tan serio?",
-        "ga": "Cén fáth chomh dáiríre sin?"
-      },
+      "quote": "Why so serious?",
       "author": "Joker",
-      "category": "movie",
-      "Title": "Dark Knight(2008)",
-      "image": "images/4.jpg"
+      "tags": ["movie"]
     },
     {
-      "text": {
-        "en": "I'd rather trust and regret than doubt and regret.",
-        "ja": "疑って後悔するより信じて後悔したい。",
-        "fr": "Je préfère faire confiance et regretter que douter et regretter.",
-        "es": "Prefiero confiar y arrepentirme que dudar y arrepentirme.",
-        "ga": "Is fearr liom muinín agus aiféala ná amhras agus aiféala."
-      },
+      "quote": "I'd rather trust and regret than doubt and regret.",
       "author": "Kirito",
-      "category": "anime",
-      "Title": "Sword Art Online",
-      "image": "images/5.jpg"
+      "tags": ["anime"]
     },
     {
-      "text": {
-        "en": "It's over 9000!",
-        "ja": "9000を超えている!",
-        "fr": "Cest plus de 9000 !",
-        "es": "¡Es más de 9000!",
-        "ga": "Tá sé os cionn 9000!"
-      },
+      "quote": "It's over 9000!",
       "author": "Vegeta",
-      "category": "anime",
-      "Title": "Dragonball",
-      "image": "images/6.jpg"
+      "tags": ["anime"]
     },
     {
-      "text": {
-        "en": "You're gonna be a bridesmaid, but you're never gonna be a bride!",
-        "ja": "あなたは常にブライズメイド、決して花嫁にはならない！",
-        "fr": "Tu seras demoiselle dhonneur, jamais mariée !",
-        "es": "¡Serás dama de honor, pero nunca la novia!",
-        "ga": "Beidh tú i do bhrídeog, ach ní bheidh tú i do bhríde."
-      },
+      "quote": "You're gonna be a bridesmaid, but you're never gonna be a bride!",
       "author": "Annie",
-      "category": "movie",
-      "Title": "Bridesmaids (2011)",
-      "image": "images/7.jpg"
+      "tags": ["anime"]
     },
     {
-      "text": {
-        "en": "I'm not a hero, I'm just a guy who likes to eat.",
-        "ja": "俺はヒーローじゃない。ただ食べるのが好きなだけだ。",
-        "fr": "Je ne suis pas un héros, juste un gars qui aime manger.",
-        "es": "No soy un héroe, solo un tipo que le gusta comer.",
-        "ga": "Ní laoch mé, ach duine a thaitníonn bia leis."
-      },
+      "quote": "I'm not a hero, I'm just a guy who likes to eat.",
       "author": "Goku",
-      "category": "anime",
-      "Title": "Dragonball",
-      "image": "images/8.jpg"
+      "tags": ["anime"]
     },
     {
-      "text": {
-        "en": "I am not gonna run away, I never go back on my word! That is my nindo: my ninja way.",
-        "ja": "俺は逃げない、言ったことは曲げねえ！それが俺の忍道だ。",
-        "fr": "Je ne fuirai pas et je ne reviendrai jamais sur ma parole ! Cest mon nindo, ma voie ninja.",
-        "es": "¡No voy a huir y nunca me retracto de mi palabra! Ese es mi nindo: mi camino ninja.",
-        "ga": "Ní rithfidh mé agus ní sháróidh mé mo fhocal! Sin é mo bhealach ninja."
-      },
+      "quote": "I am not gonna run away, I never go back on my word! That is my nindo: my ninja way.",
       "author": "Naruto",
-      "category": "anime",
-      "Title": "Naruto",
-      "image": "images/9.jpg"
+      "tags": ["anime"]
+    },
+    {
+      "quote": "If you do not take risks, you can not create a future.",
+      "author": "Monkey D.Luffy",
+      "tags": ["inspirational", "anime"]
+    },
+    {
+      "quote": "The moment you think of giving up, think of the reason why you held on so long.",
+      "author": "Natsu Dragneel",
+      "tags": ["inspirational", "anime"]
+    },
+    {
+      "quote": "It is not who I am underneath, but what I do that defines me.",
+      "author": "Bruce Wayne",
+      "tags": ["inspirational", "movie"]
+    },
+    {
+      "quote": "Nobody is gonna hit as hard as life, but it is how hard you can hit. It is how hard you can get hit and keep moving forward.",
+      "author": "Rocky Balboa",
+      "tags": ["inspirational", "movie"]
+    },
+    {
+      "quote": "Life moves pretty fast. If you do not stop and look around once in a while, you could miss it.",
+      "author": "Ferris Bueller",
+      "tags": ["movie"]
     }
   ]
-  
-=======
-[
-    { "quote": "Believe in yourself.", "author": "Unknown", "category": "motivational" },
-    { "quote": "To know oneself is to study oneself in action with another person.", "author": "Bruce Lee", "category": "inspirational" },
-    { "quote": "Power comes in response to a need, not a desire.", "author": "Goku", "category": "anime", "Title": "Dragonball" },
-    { "quote": "Just keep swimming.", "author": "Dory", "category": "movie", "Title": "Finding Nemo"},
-    { "quote": "Why so serious?", "author": "Joker", "category": "movie", "Title": "Dark Knight(2008)"},
-    { "quote": "I'd rather trust and regret than doubt and regret.", "author": "Kirito", "category": "anime", "Title": "Sword Art Online"},
-    { "quote": "It's over 9000!", "author": "Vegeta", "category": "anime", "Title": "Dragonball"},
-    { "quote": "You're gonna be a bridesmaid, but you're never gonna be a bride!", "author": "Annie", "category": "movie", "Title": "Bridesmaids (2011)"},
-    { "quote": "I'm not a hero, I'm just a guy who likes to eat.", "author": "Goku", "category": "anime", "Title": "Dragonball"},
-    { "quote": "I am not gonna run away, I never go back on my word! That is my nindo: my ninja way.", "author": "Naruto", "category": "anime", "Title": "Naruto"},
-    { "quote": "If you do not take risks, you can not create a future.", "author": "Monkey D.Luffy", "category": "anime", "Title": "One Piece"},
-    { "quote": "The moment you think of giving up, think of the reason why you held on so long.", "author": "Natsu Dragneel", "category": "anime", "Title": "Fairy Tail"},
-    { "quote": "It is not who I am underneath, but what I do that defines me.", "author": "Bruce Wayne", "category": "movie", "Title": ""},
-    { "quote": "Nobody is gonna hit as hard as life, but it is how hard you can hit. It is how hard you can get hit and keep moving forward.", "author": "Rocky Balboa", "category": "movie", "Title": ""},
-    { "quote": "Life moves pretty fast. If you do not stop and look around once in a while, you could miss it.", "author": "Ferris Bueller", "category": "movie", "Title": ""}
-
-]
->>>>>>> 5d45426917b7b368a3b43808068c447415530100:db/quotes.json
