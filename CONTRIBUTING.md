@@ -47,19 +47,19 @@ Thank you for considering contributing to this project! We appreciate your time 
 9. Open a Pull Request against the main repository
 
 ## 🔍 Pull Request Guidelines
-Reference any related issues in your PR description (e.g., "Fixes #123")
+- Reference any related issues in your PR description (e.g., "Fixes #123")
 
-Include a clear description of your changes
+- Include a clear description of your changes
 
-Ensure all existing tests pass (run npm test if applicable)
+- Ensure all existing tests pass (run npm test if applicable)
 
-Add new tests for your changes when appropriate
+- Add new tests for your changes when appropriate
 
-Update documentation (README, comments, etc.) if necessary
+- Update documentation (README, comments, etc.) if necessary
 
-Keep PRs focused on a single feature or fix
+- Keep PRs focused on a single feature or fix
 
-Avoid including unrelated changes
+- Avoid including unrelated changes
 
 ## 📜 Code of Conduct
 Please note that this project follows a Contributor Code of Conduct. By participating, you agree to abide by its terms.
@@ -67,7 +67,7 @@ Please note that this project follows a Contributor Code of Conduct. By particip
 ## ❓ Questions?
 If you have any questions about contributing:
 
-Open an issue in the issue tracker
+- Open an issue in the issue tracker
 
-Contact @Kelvin-droid3 directly
+- Contact @Kelvin-droid3 directly
 
