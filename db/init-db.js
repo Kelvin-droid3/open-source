@@ -1,29 +1,54 @@
 const Database = require('better-sqlite3');
 const fs = require('fs');
 const path = require('path');
+const DEBUG = require('./config.json');
+const TABLES = require('./schema.js').TABLES;
 
-// Configure paths
-const PROJECT_ROOT = process.cwd();
-const DB_DIR = path.join(PROJECT_ROOT, 'db');
+const DB_DIR = path.join(process.cwd(), 'db');
 const DB_PATH = path.join(DB_DIR, 'quotes.db');
 const JSON_PATH = path.join(DB_DIR, 'quotes.json');
 
-// Create db directory if needed
-if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
-}
-
-// Initialise database
 const db = new Database(DB_PATH);
 
-// Debug configuration
-const DEBUG = {
-    SHOW_QUOTE_DETAILS: true,
-    SHOW_TAG_DETAILS: true,
-    SHOW_STATS: true
-};
+function removeExistingTables(db) {
+    db.exec(`
+        DROP TABLE IF EXISTS quote_tags;
+        DROP TABLE IF EXISTS tags;
+        DROP TABLE IF EXISTS quotes;
+    `);
+}
 
-// Type validation
+function createSchema(db) {
+    db.exec(`
+        CREATE TABLE quotes (
+            ${TABLES.quotes.ID} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TABLES.quotes.QUOTE} TEXT NOT NULL,
+            ${TABLES.quotes.AUTHOR} TEXT NOT NULL DEFAULT 'Unknown'
+        );
+        
+        CREATE TABLE tags (
+            ${TABLES.tags.ID} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TABLES.tags.NAME} TEXT NOT NULL UNIQUE COLLATE NOCASE
+        );
+        
+        CREATE TABLE quote_tags (
+            ${TABLES.quote_tags.QUOTE_ID} INTEGER,
+            ${TABLES.quote_tags.TAG_ID} INTEGER,
+            PRIMARY KEY (${TABLES.quote_tags.QUOTE_ID}, ${TABLES.quote_tags.TAG_ID}),
+            FOREIGN KEY (${TABLES.quote_tags.QUOTE_ID}) REFERENCES quotes(${TABLES.quotes.ID}) ON DELETE CASCADE,
+            FOREIGN KEY (${TABLES.quote_tags.TAG_ID}) REFERENCES tags(${TABLES.tags.ID}) ON DELETE CASCADE
+        );
+    `);
+}
+
+function loadQuotes() {
+    const quotes = JSON.parse(fs.readFileSync(JSON_PATH, 'utf8'));
+    if (!Array.isArray(quotes)) {
+        throw new Error('quotes.json should contain an array of quote objects');
+    }
+    return quotes;
+}
+
 function validateValue(value, expectedType, fieldName, index) {
     if (typeof value !== expectedType) {
         throw new Error(
@@ -34,56 +59,23 @@ function validateValue(value, expectedType, fieldName, index) {
     }
 }
 
+if (!fs.existsSync(JSON_PATH)) {
+    throw new Error(`Missing quotes.json at ${JSON_PATH}`);
+}
+
 try {
     console.log('Starting database initialisation...\n');
 
-    // Drop and recreate tables
     console.log('Cleaning existing tables...');
-    db.exec(`
-        DROP TABLE IF EXISTS quote_tags;
-        DROP TABLE IF EXISTS tags;
-        DROP TABLE IF EXISTS quotes;
-    `);
+    removeExistingTables(db)
 
     console.log('Creating new schema...');
-    db.exec(`
-        CREATE TABLE quotes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            quote TEXT NOT NULL,
-            author TEXT NOT NULL DEFAULT 'Unknown'
-        );
-        
-        CREATE TABLE tags (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE COLLATE NOCASE
-        );
-        
-        CREATE TABLE quote_tags (
-            quote_id INTEGER,
-            tag_id INTEGER,
-            PRIMARY KEY (quote_id, tag_id),
-            FOREIGN KEY (quote_id) REFERENCES quotes(id) ON DELETE CASCADE,
-            FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
-        );
-    `);
+    createSchema(db)
 
-    // Create indexes
     console.log('Creating indexes...');
     db.exec('CREATE INDEX IF NOT EXISTS idx_author ON quotes (author)');
     db.exec('CREATE INDEX IF NOT EXISTS idx_tag_name ON tags (name)');
 
-    // Load quotes data
-    console.log('\nLoading quotes data...');
-    if (!fs.existsSync(JSON_PATH)) {
-        throw new Error(`Missing quotes.json at ${JSON_PATH}`);
-    }
-    const quotes = JSON.parse(fs.readFileSync(JSON_PATH, 'utf8'));
-    
-    if (!Array.isArray(quotes)) {
-        throw new Error('quotes.json should contain an array of quote objects');
-    }
-
-    // Prepare statements
     const insertQuote = db.prepare(`
         INSERT INTO quotes (quote, author)
         VALUES (@quote, @author)
@@ -102,6 +94,9 @@ try {
         INSERT INTO quote_tags (quote_id, tag_id)
         VALUES (@quote_id, @tag_id)
     `);
+
+    console.log('\nLoading quotes data...');
+    const quotes = loadQuotes()
 
     // Initialise statistics
     let tagStats = {
