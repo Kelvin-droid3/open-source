@@ -5,6 +5,23 @@ It was created as part of a college module group project.
 
 ---
 
+📚 Table of Contents
+📝 Description
+
+🛠️ Technologies Used
+
+📁 File Structure
+
+🚀 How to Run
+
+👨‍💻 Team Members
+
+📸 Screenshot
+
+📄 License
+
+---
+
 📝 Description
 
 This simple website showcases basic front-end skills. It includes a navigation bar, clean layout, and interactive elements.  
@@ -14,8 +31,8 @@ The goal is to practice and demonstrate teamwork, version control, and UI design
 
 🛠️ Technologies Used
 
-- HTML5  
-- CSS3  
+- HTML5
+- CSS3
 - JavaScript
 - Python
 
@@ -28,7 +45,6 @@ The goal is to practice and demonstrate teamwork, version control, and UI design
 └── script.js # JavaScript for interactions
 └── Python #...
 
-
 ---
 
 🚀 How to Run
@@ -36,7 +52,7 @@ The goal is to practice and demonstrate teamwork, version control, and UI design
 1. Clone the repo:
    ```bash
    git clone https://github.com/Kelvin-droid3/open-source.git
-
+   ```
 
 👨‍💻 Team Members
 Kelvin (@Kelvin-droid3)
