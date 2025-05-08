@@ -10,7 +10,7 @@ It was created as part of a college module group project.
 
 - [📝Description](#description)
 
-- [🛠️Technologies Used](#technologies-used)
+- [🔧Technologies Used](#technologies-used)
 
 - [📁File Structure](#file-structure)
 
@@ -32,7 +32,7 @@ The main idea was to practice working together as a team, using tools to keep tr
 
 ---
 
-# 🛠️Technologies Used
+# 🔧Technologies Used
 
 - HTML5
 
