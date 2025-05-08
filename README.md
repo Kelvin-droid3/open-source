@@ -42,21 +42,24 @@ The goal is to practice and demonstrate teamwork, version control, and UI design
 
 ---
 
-🚀 How to Run
+## 🚀 How to Run
 
 1. Clone the repo:
    ```bash
    git clone https://github.com/Kelvin-droid3/open-source.git
    ```
 
-👨‍💻 Team Members
+## 👨‍💻 Team Members
+
 Kelvin (@Kelvin-droid3)
 Luke (@empafee)
 Mike(@)
 
-📸 Screenshot
+## 📸 Screenshot
+
 ![image](https://github.com/user-attachments/assets/60449df9-679c-475e-8a18-3f695cc9835c)
 
-📄 License
+## 📄 License
+
 This project is licensed under the MIT License.
 See the LICENSE file for more details.
