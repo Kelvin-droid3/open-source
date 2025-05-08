@@ -8,23 +8,23 @@ It was created as part of a college module group project.
 
 ## 📚 Table of Contents
 
-- [📝 Description](#description)
+- [Description](#description)
 
-- [🛠️ Technologies Used](#technologies-used)
+- [Technologies Used](#technologies-used)
 
-- [📁 File Structure](#file-structure)
+- [File Structure](#file-structure)
 
-- [🚀 How to Run](#how-to-run)
+- [How to Run](#how-to-run)
 
-- [👨‍💻 Team Members](#team-members)
+- [Team Members](#team-members)
 
-- [📸 Screenshot](#screenshot)
+- [Screenshot](#screenshot)
 
-- [📄 License](#license)
+- [License](#license)
 
 ---
 
-# 📝 Description
+# Description
 
 This simple website shows off some basic skills in making websites. It has a menu at the top, a clean way of showing things, and some parts that you can click and interact with.
 
@@ -32,7 +32,7 @@ The main idea was to practice working together as a team, using tools to keep tr
 
 ---
 
-# 🛠️ Technologies Used
+# Technologies Used
 
 - HTML5
 
@@ -44,7 +44,7 @@ The main idea was to practice working together as a team, using tools to keep tr
 
 ---
 
-# 📁 File Structure
+# File Structure
 
 This is how the files in the project are organized:
 
@@ -58,7 +58,7 @@ This is how the files in the project are organized:
 
 ---
 
-# 🚀 How to Run
+# How to Run
 
 Here's how you can see this website in your own browser:
 
@@ -70,7 +70,7 @@ git clone [https://github.com/Kelvin-droid3/open-source.git](https://github.com/
 
 ```
 
-# 👨‍💻 Team Members
+# Team Members
 
 These are the people who worked on this project:
 
@@ -80,12 +80,12 @@ Luke (@empafee)
 
 Mike(@BieningMike)
 
-# 📸 Screenshot
+# Screenshot
 
 Here's a picture of what the website looks like:
 
 ![image](https://github.com/user-attachments/assets/60449df9-679c-475e-8a18-3f695cc9835c)
 
-# 📄 License
+# License
 
 This project has a license called the MIT License. This basically tells other people what they can and can't do with your code. You can find more details about it in a file named `LICENSE`.
