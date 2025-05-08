@@ -5,20 +5,15 @@ It was created as part of a college module group project.
 
 ---
 
-📚 Table of Contents
-📝 Description
+## 📚 Table of Contents
 
-🛠️ Technologies Used
-
-📁 File Structure
-
-🚀 How to Run
-
-👨‍💻 Team Members
-
-📸 Screenshot
-
-📄 License
+- [📝 Description](#description)
+- [🛠️ Technologies Used](#technologies-used)
+- [📁 File Structure](#file-structure)
+- [🚀 How to Run](#how-to-run)
+- [👨‍💻 Team Members](#team-members)
+- [📸 Screenshot](#screenshot)
+- [📄 License](#license)
 
 ---
 
