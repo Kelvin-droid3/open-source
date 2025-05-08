@@ -1,4 +1,4 @@
-Open Source Project - Quotes R Us
+# Open Source Project - Quotes R Us
 
 This project is a basic website made with **HTML**, **CSS**, and **JavaScript**.  
 It was created as part of a college module group project.
@@ -17,14 +17,14 @@ It was created as part of a college module group project.
 
 ---
 
-📝 Description
+## 📝 Description
 
 This simple website showcases basic front-end skills. It includes a navigation bar, clean layout, and interactive elements.  
 The goal is to practice and demonstrate teamwork, version control, and UI design.
 
 ---
 
-🛠️ Technologies Used
+## 🛠️ Technologies Used
 
 - HTML5
 - CSS3
