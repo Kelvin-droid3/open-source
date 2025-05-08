@@ -1,54 +1,99 @@
 const Database = require('better-sqlite3');
-const fs = require('fs');
-const path = require('path');
-const DEBUG = require('./config.json');
-const TABLES = require('./schema.js').TABLES;
+const fs       = require('fs');
+const path     = require('path');
+const DEBUG    = require('./config.json');
+const { TABLES } = require('./schema.js');
 
-const DB_DIR = path.join(process.cwd(), 'db');
-const DB_PATH = path.join(DB_DIR, 'quotes.db');
+const DB_DIR    = path.join(process.cwd(), 'db');
+const DB_PATH   = path.join(DB_DIR, 'quotes.db');
 const JSON_PATH = path.join(DB_DIR, 'quotes.json');
 
 const db = new Database(DB_PATH);
 
+// Drop all existing tables
 function removeExistingTables(db) {
-    db.exec(`
-        DROP TABLE IF EXISTS quote_tags;
-        DROP TABLE IF EXISTS tags;
-        DROP TABLE IF EXISTS quotes;
-    `);
+  db.exec(`
+    DROP TABLE IF EXISTS ${TABLES.favourites ? 'favourites' : 'favourites'};
+    DROP TABLE IF EXISTS ${TABLES.tag_synonyms ? 'tag_synonyms' : 'tag_synonyms'};
+    DROP TABLE IF EXISTS ${TABLES.quote_tags ? 'quote_tags' : 'quote_tags'};
+    DROP TABLE IF EXISTS ${TABLES.tags       ? 'tags'       : 'tags'};
+    DROP TABLE IF EXISTS ${TABLES.quotes     ? 'quotes'     : 'quotes'};
+  `);
 }
 
+// Create schema for quotes, tags, quote_tags, tag_synonyms and favourites
 function createSchema(db) {
-    db.exec(`
-        CREATE TABLE quotes (
-            ${TABLES.quotes.ID} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${TABLES.quotes.QUOTE} TEXT NOT NULL,
-            ${TABLES.quotes.AUTHOR} TEXT NOT NULL DEFAULT 'Unknown'
-        );
-        
-        CREATE TABLE tags (
-            ${TABLES.tags.ID} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${TABLES.tags.NAME} TEXT NOT NULL UNIQUE COLLATE NOCASE
-        );
-        
-        CREATE TABLE quote_tags (
-            ${TABLES.quote_tags.QUOTE_ID} INTEGER,
-            ${TABLES.quote_tags.TAG_ID} INTEGER,
-            PRIMARY KEY (${TABLES.quote_tags.QUOTE_ID}, ${TABLES.quote_tags.TAG_ID}),
-            FOREIGN KEY (${TABLES.quote_tags.QUOTE_ID}) REFERENCES quotes(${TABLES.quotes.ID}) ON DELETE CASCADE,
-            FOREIGN KEY (${TABLES.quote_tags.TAG_ID}) REFERENCES tags(${TABLES.tags.ID}) ON DELETE CASCADE
-        );
-    `);
+  db.exec(`
+    CREATE TABLE quotes (
+      ${TABLES.quotes.ID}     INTEGER PRIMARY KEY AUTOINCREMENT,
+      ${TABLES.quotes.QUOTE}  TEXT    NOT NULL,
+      ${TABLES.quotes.AUTHOR} TEXT    NOT NULL DEFAULT 'Unknown'
+    );
+
+    CREATE TABLE tags (
+      ${TABLES.tags.ID}   INTEGER PRIMARY KEY AUTOINCREMENT,
+      ${TABLES.tags.NAME} TEXT    NOT NULL UNIQUE COLLATE NOCASE
+    );
+
+    CREATE TABLE quote_tags (
+      ${TABLES.quote_tags.QUOTE_ID} INTEGER,
+      ${TABLES.quote_tags.TAG_ID}   INTEGER,
+      PRIMARY KEY (
+        ${TABLES.quote_tags.QUOTE_ID},
+        ${TABLES.quote_tags.TAG_ID}
+      ),
+      FOREIGN KEY (${TABLES.quote_tags.QUOTE_ID}) REFERENCES quotes(${TABLES.quotes.ID}) ON DELETE CASCADE,
+      FOREIGN KEY (${TABLES.quote_tags.TAG_ID})   REFERENCES tags(${TABLES.tags.ID})   ON DELETE CASCADE
+    );
+
+    CREATE TABLE tag_synonyms (
+      ${TABLES.tag_synonyms.VARIANT}   TEXT PRIMARY KEY,
+      ${TABLES.tag_synonyms.CANONICAL} TEXT NOT NULL,
+      FOREIGN KEY (${TABLES.tag_synonyms.CANONICAL}) REFERENCES tags(${TABLES.tags.NAME}) ON DELETE CASCADE
+    );
+
+    CREATE TABLE favourites (
+      ${TABLES.favourites.ID}         INTEGER PRIMARY KEY AUTOINCREMENT,
+      ${TABLES.favourites.QUOTE}      TEXT    NOT NULL,
+      ${TABLES.favourites.AUTHOR}     TEXT    NOT NULL DEFAULT 'Unknown',
+      ${TABLES.favourites.TAGS}       TEXT    NOT NULL,
+      ${TABLES.favourites.CREATED_AT} TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 }
 
+// Load and validate quotes.json
 function loadQuotes() {
-    const quotes = JSON.parse(fs.readFileSync(JSON_PATH, 'utf8'));
-    if (!Array.isArray(quotes)) {
-        throw new Error('quotes.json should contain an array of quote objects');
-    }
-    return quotes;
+  if (!fs.existsSync(JSON_PATH)) {
+    throw new Error(`Missing quotes.json at ${JSON_PATH}`);
+  }
+  const data = fs.readFileSync(JSON_PATH, 'utf8');
+  const quotes = JSON.parse(data);
+  if (!Array.isArray(quotes)) {
+    throw new Error('quotes.json should contain an array of quote objects');
+  }
+  return quotes;
 }
 
+// Tag normalisation mapping
+const TAG_MAPPINGS = {
+  live:          'life',
+  miracles:      'miracle',
+  humor:         'humour',
+  friends:       'friendship',
+  plans:         'planning',
+  lies:          'lying',
+  dreamers:      'dreams',
+  dreaming:      'dreams',
+  'fairy-tales': 'fairytales',
+  inspiration:   'inspirational',
+  romantic:      'romance',
+  read:          'reading',
+  understand:    'understanding',
+  write:         'writing'
+};
+
+// Validate field types
 function validateValue(value, expectedType, fieldName, index) {
   if (typeof value !== expectedType) {
     throw new Error(
@@ -59,143 +104,108 @@ function validateValue(value, expectedType, fieldName, index) {
   }
 }
 
-if (!fs.existsSync(JSON_PATH)) {
-    throw new Error(`Missing quotes.json at ${JSON_PATH}`);
-}
-
-// Main initialise sequence
+// Main initialisation
 try {
   console.log('Starting database initialisation…\n');
 
-    console.log('Cleaning existing tables...');
-    removeExistingTables(db)
+  console.log('Cleaning existing tables…');
+  removeExistingTables(db);
 
-    console.log('Creating new schema...');
-    createSchema(db)
+  console.log('Creating new schema…');
+  createSchema(db);
 
-    console.log('Creating indexes...');
-    db.exec('CREATE INDEX IF NOT EXISTS idx_author ON quotes (author)');
-    db.exec('CREATE INDEX IF NOT EXISTS idx_tag_name ON tags (name)');
+  console.log('Creating indexes…');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_author   ON quotes(author)');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_tag_name ON tags(name)');
 
-    const insertQuote = db.prepare(`
-        INSERT INTO quotes (quote, author)
-        VALUES (@quote, @author)
-    `);
-    
-    const insertTag = db.prepare(`
-        INSERT OR IGNORE INTO tags (name)
-        VALUES (@name)
-    `);
-    
-    const getTagId = db.prepare(`
-        SELECT id FROM tags WHERE name = @name
-    `).pluck();
-    
-    const linkTag = db.prepare(`
-        INSERT INTO quote_tags (quote_id, tag_id)
-        VALUES (@quote_id, @tag_id)
-    `);
+  // Prepare statements
+  const insertQuote   = db.prepare(`INSERT INTO quotes (quote, author) VALUES (@quote, @author)`);
+  const insertTag     = db.prepare(`INSERT OR IGNORE INTO tags (name) VALUES (@name)`);
+  const getTagId      = db.prepare(`SELECT id FROM tags WHERE name = @name`).pluck();
+  const linkTag       = db.prepare(`INSERT OR IGNORE INTO quote_tags (quote_id, tag_id) VALUES (@quote_id, @tag_id)`);
+  const insertSynonym = db.prepare(`INSERT INTO tag_synonyms (variant, canonical) VALUES (@variant, @canonical)`);
 
-    console.log('\nLoading quotes data...');
-    const quotes = loadQuotes()
+  console.log('\nLoading quotes data…');
+  const quotes = loadQuotes();
 
-    // Initialise statistics
-    let tagStats = {
-        totalAssignments: 0,
-        tagCounts: new Map(),
-        quotesWithTags: 0,
-        quotesWithoutTags: 0
-    };
+  // Statistics
+  const tagStats = {
+    totalAssignments: 0,
+    tagCounts: new Map(),
+    quotesWithTags: 0,
+    quotesWithoutTags: 0
+  };
 
   console.log(`\nProcessing ${quotes.length} quotes…`);
-  const progress = setInterval(() => process.stdout.write('.'), 100);
+  const prog = setInterval(() => process.stdout.write('.'), 100);
 
-    // Process quotes in transaction
-    db.transaction(() => {
-        quotes.forEach((quoteData, index) => {
-            try {
-                const quoteNum = index + 1;
-                if (DEBUG.SHOW_QUOTE_DETAILS) {
-                    console.log(`\nQuote #${quoteNum} [${quoteData.author}]`);
-                    console.log(`   ${quoteData.quote}`);
-                }
+  db.transaction(() => {
+    // Seed canonical tags & synonyms
+    const canonicals = Array.from(new Set(Object.values(TAG_MAPPINGS)));
+    canonicals.forEach(name => insertTag.run({ name }));
+    Object.entries(TAG_MAPPINGS).forEach(([variant, canonical]) =>
+      insertSynonym.run({ variant, canonical })
+    );
 
-                // Validate required fields
-                if (!('quote' in quoteData)) throw new Error(`Missing 'quote' field in entry ${quoteNum}`);
-                if (!('author' in quoteData)) throw new Error(`Missing 'author' field in entry ${quoteNum}`);
+    // Insert quotes + tags
+    quotes.forEach((qd, idx) => {
+      // Validate
+      if (!('quote' in qd))  throw new Error(`Missing 'quote' in entry #${idx+1}`);
+      if (!('author' in qd)) throw new Error(`Missing 'author' in entry #${idx+1}`);
 
-                // Insert quote
-                const quoteParams = {
-                    quote: String(quoteData.quote),
-                    author: String(quoteData.author || 'Unknown')
-                };
-                
-                validateValue(quoteParams.quote, 'string', 'quote', index);
-                validateValue(quoteParams.author, 'string', 'author', index);
-                
-                const { lastInsertRowid: quoteId } = insertQuote.run(quoteParams);
+      const text   = String(qd.quote);
+      const author = String(qd.author || 'Unknown');
+      validateValue(text, 'string', 'quote', idx);
+      validateValue(author, 'string', 'author', idx);
 
-                // Process tags
-                const tags = Array.isArray(quoteData.tags) 
-                    ? quoteData.tags.filter(t => typeof t === 'string' && t.trim() !== '')
-                    : [];
+      // Insert quote
+      const { lastInsertRowid: quoteId } = insertQuote.run({ quote: text, author });
 
-                if (tags.length > 0) {
-                    tagStats.quotesWithTags++;
-                    if (DEBUG.SHOW_TAG_DETAILS) {
-                        console.log(`   Tags: ${tags.join(', ')}`);
-                    }
-                } else {
-                    tagStats.quotesWithoutTags++;
-                    if (DEBUG.SHOW_TAG_DETAILS) {
-                        console.log('   No tags specified');
-                    }
-                }
+      // Process tags
+      const raw = Array.isArray(qd.tags) ? qd.tags : [];
+      const uniq = new Set();
+      raw.forEach(t => {
+        if (typeof t === 'string' && t.trim()) {
+          let n = t.trim().toLowerCase();
+          if (TAG_MAPPINGS[n]) n = TAG_MAPPINGS[n];
+          uniq.add(n);
+        }
+      });
 
-                tags.forEach(tagName => {
-                    const normalisedTag = tagName.trim().toLowerCase();
-                    insertTag.run({ name: normalisedTag });
-                    const tagId = getTagId.get({ name: normalisedTag });
-                    linkTag.run({ quote_id: quoteId, tag_id: tagId });
-                    
-                    // Update statistics
-                    tagStats.totalAssignments++;
-                    tagStats.tagCounts.set(normalisedTag, 
-                        (tagStats.tagCounts.get(normalisedTag) || 0) + 1
-                    );
-                });
+      if (uniq.size) tagStats.quotesWithTags++;
+      else           tagStats.quotesWithoutTags++;
 
-            } catch (error) {
-                console.error(`\nError processing quote #${index + 1}:`);
-                console.error(JSON.stringify(quoteData, null, 2));
-                throw error;
-            }
-        });
-    })();
+      uniq.forEach(name => {
+        insertTag.run({ name });
+        const tagId = getTagId.get({ name });
+        linkTag.run({ quote_id: quoteId, tag_id: tagId });
+        tagStats.totalAssignments++;
+        tagStats.tagCounts.set(name, (tagStats.tagCounts.get(name) || 0) + 1);
+      });
+    });
+  })();
 
-  clearInterval(progress);
-  console.log('\n\nSuccessfully processed all quotes!');
+  clearInterval(prog);
+  console.log('\n\nAll quotes processed successfully!');
 
-  // Show statistics if enabled
   if (DEBUG.SHOW_STATS) {
-    const uniqueTagCount = db.prepare('SELECT COUNT(*) FROM tags').pluck().get();
+    const uniqueCount = db.prepare('SELECT COUNT(*) FROM tags').pluck().get();
     console.log('\nStatistics:');
-    console.log(`  Total quotes processed: ${quotes.length}`);
-    console.log(`  With tags: ${tagStats.quotesWithTags}`);
-    console.log(`  Without tags: ${tagStats.quotesWithoutTags}`);
-    console.log(`  Unique tags created: ${uniqueTagCount}`);
-    console.log(`  Total tag assignments: ${tagStats.totalAssignments}`);
+    console.log(` Total quotes: ${quotes.length}`);
+    console.log(` With tags:    ${tagStats.quotesWithTags}`);
+    console.log(` Without tags: ${tagStats.quotesWithoutTags}`);
+    console.log(` Unique tags:  ${uniqueCount}`);
+    console.log(` Tag links:    ${tagStats.totalAssignments}`);
     const sorted = [...tagStats.tagCounts.entries()].sort((a,b) => b[1]-a[1]);
     console.log('\nTop 5 tags:');
-    sorted.slice(0,5).forEach(([tag, count], i) => {
-      console.log(`  ${i+1}. ${tag} (${count})`);
-    });
+    sorted.slice(0,5).forEach(([tag,c], i) =>
+      console.log(`  ${i+1}. ${tag} (${c})`)
+    );
   }
 
-} catch (error) {
-    console.error('\nInitialisation failed:', error.message);
-    process.exit(1);
-
+} catch (err) {
+  console.error('\nInitialisation failed:', err.message);
+  process.exit(1);
 } finally {
   db.close();
 }
