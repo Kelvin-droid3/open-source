@@ -8,9 +8,9 @@ It was created as part of a college module group project.
 
 ## 📚 Table of Contents
 
-- [Description](#description)
+- [📝Description](#description)
 
-- [Technologies Used](#technologies-used)
+- [🛠️Technologies Used](#technologies-used)
 
 - [File Structure](#file-structure)
 
@@ -24,7 +24,7 @@ It was created as part of a college module group project.
 
 ---
 
-# Description
+# 📝Description
 
 This simple website shows off some basic skills in making websites. It has a menu at the top, a clean way of showing things, and some parts that you can click and interact with.
 
@@ -32,7 +32,7 @@ The main idea was to practice working together as a team, using tools to keep tr
 
 ---
 
-# Technologies Used
+# 🛠️Technologies Used
 
 - HTML5
 
