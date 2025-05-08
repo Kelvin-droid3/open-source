@@ -1,6 +1,6 @@
 # Open Source Project - Quotes R Us
 
-This project is a basic website made with **HTML**, **CSS**, and **JavaScript**.  
+This project is a basic website made with **HTML**, **CSS**, and **JavaScript**.
 It was created as part of a college module group project.
 
 ---
@@ -19,7 +19,7 @@ It was created as part of a college module group project.
 
 ## 📝 Description
 
-This simple website showcases basic front-end skills. It includes a navigation bar, clean layout, and interactive elements.  
+This simple website showcases basic front-end skills. It includes a navigation bar, clean layout, and interactive elements.
 The goal is to practice and demonstrate teamwork, version control, and UI design.
 
 ---
@@ -46,7 +46,7 @@ The goal is to practice and demonstrate teamwork, version control, and UI design
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/Kelvin-droid3/open-source.git
+   git clone [https://github.com/Kelvin-droid3/open-source.git](https://github.com/Kelvin-droid3/open-source.git)
    ```
 
 ## 👨‍💻 Team Members
