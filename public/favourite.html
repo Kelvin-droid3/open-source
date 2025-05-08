@@ -1,36 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Favorites - Quotes R Us</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <title>Favourites - Quotes R Us</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Your Favorite Quotes</h1>
-    <div id="favorites-list"></div>
-    <a href="index.html">Back</a>
-  </div>
+  <header>
+    <div class="header-container">
+      <h1 class="logo">
+        <i class="fas fa-quote-left"></i> Quotes R Us
+      </h1>
+      <div class="header-controls">
+        <button id="themeToggle" class="theme-toggle">
+          <i class="fas fa-moon"></i> Dark Mode
+        </button>
+      </div>
+    </div>
+  </header>
 
-  <script>
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    const list = document.getElementById('favorites-list');
+  <main class="main-container">
+    <h1><i class="fas fa-star"></i> Your Favourite Quotes</h1>
+    <div id="favourites-grid" class="favourites-grid"></div>
+    <a href="index.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Quotes
+    </a>
+  </main>
 
-    // Show message if no favorites
-    if (favorites.length === 0) {
-      list.innerHTML = '<p>No favorite quotes yet.</p>';
-    } else {
-      favorites.forEach((q) => {
-        const div = document.createElement('div');
-        div.className = 'quote-block';
-        div.innerHTML = `
-          <img src="${q.image}" alt="Quote Image" />
-          <p>${q.text}</p>
-          <p><strong>- ${q.author}</strong></p>
-        `;
-        list.appendChild(div);
-      });
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>

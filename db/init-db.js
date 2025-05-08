@@ -23,6 +23,24 @@ const DEBUG = {
     SHOW_STATS: true
 };
 
+// Tag normalisation mapping 
+const TAG_MAPPINGS = {
+    'live': 'life',
+    'miracles': 'miracle',  
+    'humor': 'humour',
+    'friends': 'friendship',
+    'plans': 'planning',
+    'lies': 'lying',
+    'dreamers': 'dreams',
+    'dreaming': 'dreams',
+    'fairy-tales': 'fairytales',
+    'inspiration': 'inspirational',
+    'romantic': 'romance',
+    'read': 'reading',
+    'understand': 'understanding',
+    'write': 'writing'
+};
+
 // Type validation
 function validateValue(value, expectedType, fieldName, index) {
     if (typeof value !== expectedType) {
@@ -41,8 +59,10 @@ try {
     console.log('Cleaning existing tables...');
     db.exec(`
         DROP TABLE IF EXISTS quote_tags;
+        DROP TABLE IF EXISTS tag_synonyms;
         DROP TABLE IF EXISTS tags;
         DROP TABLE IF EXISTS quotes;
+        DROP TABLE IF EXISTS favourites;
     `);
 
     console.log('Creating new schema...');
@@ -65,10 +85,24 @@ try {
             FOREIGN KEY (quote_id) REFERENCES quotes(id) ON DELETE CASCADE,
             FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
         );
+
+        CREATE TABLE tag_synonyms (
+            variant TEXT PRIMARY KEY,
+            canonical TEXT NOT NULL,
+            FOREIGN KEY (canonical) REFERENCES tags(name) ON DELETE CASCADE
+        );
+
+        CREATE TABLE favourites (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            quote TEXT NOT NULL,
+            author TEXT NOT NULL,
+            tags TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );  
     `);
 
-    // Create indexes
-    console.log('Creating indexes...');
+    // Create indices
+    console.log('Creating indices...');
     db.exec('CREATE INDEX IF NOT EXISTS idx_author ON quotes (author)');
     db.exec('CREATE INDEX IF NOT EXISTS idx_tag_name ON tags (name)');
 
@@ -99,7 +133,7 @@ try {
     `).pluck();
     
     const linkTag = db.prepare(`
-        INSERT INTO quote_tags (quote_id, tag_id)
+        INSERT OR IGNORE INTO quote_tags (quote_id, tag_id)
         VALUES (@quote_id, @tag_id)
     `);
 
@@ -118,6 +152,22 @@ try {
 
     // Process quotes in transaction
     db.transaction(() => {
+        // First insert canonical tags from mappings
+        const canonicals = [...new Set(Object.values(TAG_MAPPINGS))];
+        canonicals.forEach(canonical => {
+            insertTag.run({ name: canonical });
+        });
+
+        // Insert tag synonyms
+        const insertSynonym = db.prepare(`
+            INSERT INTO tag_synonyms (variant, canonical)
+            VALUES (@variant, @canonical)
+        `);
+        Object.entries(TAG_MAPPINGS).forEach(([variant, canonical]) => {
+            insertSynonym.run({ variant, canonical });
+        });
+
+        // Process quotes
         quotes.forEach((quoteData, index) => {
             try {
                 const quoteNum = index + 1;
@@ -141,15 +191,24 @@ try {
                 
                 const { lastInsertRowid: quoteId } = insertQuote.run(quoteParams);
 
-                // Process tags
-                const tags = Array.isArray(quoteData.tags) 
+                // Process tags with normalisation and deduplication
+                const rawTags = Array.isArray(quoteData.tags) 
                     ? quoteData.tags.filter(t => typeof t === 'string' && t.trim() !== '')
                     : [];
 
-                if (tags.length > 0) {
+                const uniqueTags = new Set();
+                rawTags.forEach(tagName => {
+                    let normalisedTag = tagName.trim().toLowerCase();
+                    if (TAG_MAPPINGS[normalisedTag]) {
+                        normalisedTag = TAG_MAPPINGS[normalisedTag];
+                    }
+                    uniqueTags.add(normalisedTag);
+                });
+
+                if (uniqueTags.size > 0) {
                     tagStats.quotesWithTags++;
                     if (DEBUG.SHOW_TAG_DETAILS) {
-                        console.log(`   Tags: ${tags.join(', ')}`);
+                        console.log(`   Tags: ${Array.from(uniqueTags).join(', ')}`);
                     }
                 } else {
                     tagStats.quotesWithoutTags++;
@@ -158,17 +217,21 @@ try {
                     }
                 }
 
-                tags.forEach(tagName => {
-                    const normalisedTag = tagName.trim().toLowerCase();
+                // Insert unique tags
+                Array.from(uniqueTags).forEach(normalisedTag => {
                     insertTag.run({ name: normalisedTag });
                     const tagId = getTagId.get({ name: normalisedTag });
-                    linkTag.run({ quote_id: quoteId, tag_id: tagId });
-                    
-                    // Update statistics
-                    tagStats.totalAssignments++;
-                    tagStats.tagCounts.set(normalisedTag, 
-                        (tagStats.tagCounts.get(normalisedTag) || 0) + 1
-                    );
+                    try {
+                        linkTag.run({ quote_id: quoteId, tag_id: tagId });
+                        tagStats.totalAssignments++;
+                        tagStats.tagCounts.set(normalisedTag, 
+                            (tagStats.tagCounts.get(normalisedTag) || 0) + 1
+                        );
+                    } catch (error) {
+                        if (!error.message.includes('UNIQUE constraint failed')) {
+                            throw error;
+                        }
+                    }
                 });
 
             } catch (error) {
@@ -205,7 +268,6 @@ try {
 } catch (error) {
     console.error('\nInitialisation failed:', error.message);
     process.exit(1);
-
 } finally {
     db.close();
 }

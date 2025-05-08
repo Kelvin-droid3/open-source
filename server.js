@@ -4,22 +4,20 @@ const app = express();
 const PORT = 3000;
 const cors = require('cors');
 
-// Database configuration
-const db = new Database('db/quotes.db');
+
+// Initialise database connection
+const db = new Database('./db/quotes.db', { 
+    verbose: console.log,
+    fileMustExist: true  // Ensures database exists before starting
+});
+
+
+// Add JSON body parsing middleware
+app.use(express.json());
 
 // Enable CORS for all origins
 app.use(cors());
-app.use(express.static('public'));
 
-let quotes = [];
-try {
-    const data = fs.readFileSync('quotes.json', 'utf8');
-    quotes = JSON.parse(data);
-} catch (error) {
-    console.error('Error loading quotes:', error);
-}
-
-const availableLanguages = ['en', 'es', 'fr', 'ja', 'ga'];
 // Precompute available tags at startup
 let availableTags = [];
 let totalQuotes = 0;
@@ -36,43 +34,9 @@ try {
     process.exit(1);
 }
 
-app.get('/random/:lang?', (req, res) => {
-    const lang = req.params.lang || 'en';
-    
-    if (!availableLanguages.includes(lang)) {
-        return res.status(400).json({ error: 'Unsupported language' });
-    }
+// Serve static files (HTML, CSS, JS)
+app.use(express.static('public'));
 
-    if (quotes.length === 0) {
-        return res.status(500).json({ error: 'No quotes available' });
-    }
-
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    const quote = quotes[randomIndex][lang] || quotes[randomIndex]['en'];
-    res.json(quote);
-});
-
-app.get('/random/:lang/:category', (req, res) => {
-    const lang = req.params.lang || 'en';
-    const category = req.params.category.toLowerCase();
-
-    if (!availableLanguages.includes(lang)) {
-        return res.status(400).json({ error: 'Unsupported language' });
-    }
-
-    const filteredQuotes = quotes
-        .map(q => q[lang] || q['en'])
-        .filter(q => q.category.toLowerCase() === category);
-
-    if (filteredQuotes.length === 0) {
-        const categories = [...new Set(quotes.map(q => (q[lang] || q['en']).category.toLowerCase()))];
-        return res.status(404).json({ 
-            error: `Invalid category. Available categories: ${categories.join(', ')}` 
-        });
-    }
-
-    const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
-    res.json(filteredQuotes[randomIndex]);
 // Get random quote endpoint
 app.get('/random', (req, res) => {
     try {
@@ -85,14 +49,17 @@ app.get('/random', (req, res) => {
             LEFT JOIN quote_tags qt ON q.id = qt.quote_id
             LEFT JOIN tags t ON qt.tag_id = t.id
             GROUP BY q.id
-            LIMIT 1 OFFSET ABS(RANDOM() % ?)
+            ORDER BY RANDOM()
+            LIMIT 1
         `);
         
-        const quote = stmt.get(totalQuotes);
-        quote.tags = JSON.parse(quote.tags || '[]'); // Convert JSON string to array
+        const quote = stmt.get();
+        if (!quote) return res.status(404).json({ error: 'No quotes found' });
         
-        quote ? res.json(quote) : res.status(404).json({ error: 'No quotes found' });
+        quote.tags = JSON.parse(quote.tags || '[]');
+        res.json(quote);
     } catch (error) {
+        console.error('Database Error:', error);
         res.status(500).json({ error: 'Failed to fetch random quote' });
     }
 });
@@ -104,7 +71,7 @@ app.get('/random/tag/:tag', (req, res) => {
     if (!availableTags.includes(requestedTag)) {
         return res.status(400).json({
             error: 'Invalid tag requested',
-            availableTags: availableTags,
+            availableTags,
             suggestion: 'Use exact tag name from /tags endpoint'
         });
     }
@@ -130,13 +97,12 @@ app.get('/random/tag/:tag', (req, res) => {
         `);
 
         const quote = stmt.get(requestedTag, requestedTag);
-        if (quote) {
-            quote.tags = JSON.parse(quote.tags);
-            res.json(quote);
-        } else {
-            res.status(404).json({ error: 'No quotes found for tag' });
-        }
+        if (!quote) return res.status(404).json({ error: 'No quotes found for tag' });
+        
+        quote.tags = JSON.parse(quote.tags);
+        res.json(quote);
     } catch (error) {
+        console.error('Tagged quote error:', error);
         res.status(500).json({ error: 'Failed to fetch tagged quote' });
     }
 });
@@ -149,15 +115,109 @@ app.get('/tags', (req, res) => {
     });
 });
 
-app.get('/categories/:lang?', (req, res) => {
-    const lang = req.params.lang || 'en';
-    const categories = [...new Set(quotes.map(q => (q[lang] || q['en']).category))];
-    res.json(categories);
+// ================== Favourites Endpoints ================== //
+app.post('/favourites', (req, res) => {
+    try {
+        const { quote, author, tags } = req.body;
+        
+        if (!quote?.trim() || !author?.trim()) {
+            return res.status(400).json({ 
+                error: 'Missing required fields: quote and author' 
+            });
+        }
+
+        const insert = db.prepare(`
+            INSERT INTO favourites (quote, author, tags)
+            VALUES (?, ?, ?)
+        `);
+        
+        const result = insert.run(
+            quote.trim(),
+            author.trim(),
+            JSON.stringify(tags || [])
+        );
+
+        res.status(201).json({
+            id: result.lastInsertRowid,
+            message: 'Favourite added successfully',
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Favourite addition error:', error);
+        res.status(500).json({ 
+            error: 'Failed to add favourite',
+            details: error.message
+        });
+    }
+});
+
+app.get('/favourites', (req, res) => {
+    try {
+        const stmt = db.prepare(`
+            SELECT id, quote, author, tags, 
+                   strftime('%Y-%m-%dT%H:%M:%SZ', created_at) AS created_at
+            FROM favourites
+            ORDER BY created_at DESC
+        `);
+        
+        const favourites = stmt.all().map(fav => ({
+            ...fav,
+            tags: JSON.parse(fav.tags)
+        }));
+
+        res.json(favourites);
+    } catch (error) {
+        console.error('Favourites retrieval error:', error);
+        res.status(500).json({ 
+            error: 'Failed to retrieve favourites',
+            details: error.message
+        });
+    }
+});
+
+
+app.delete('/favourites', (req, res) => {
+    try {
+        const { quote, author } = req.body;
+        
+        // Validate request body
+        if (!quote || typeof quote !== 'string' || 
+            !author || typeof author !== 'string') {
+            return res.status(400).json({ 
+                error: 'Invalid request format' 
+            });
+        }
+
+        const cleanQuote = quote.trim();
+        const cleanAuthor = author.trim();
+
+        const stmt = db.prepare(`
+            DELETE FROM favourites 
+            WHERE quote = ? AND author = ?
+        `);
+        
+        const result = stmt.run(cleanQuote, cleanAuthor);
+        
+        if (result.changes === 0) {
+            return res.status(404).json({ 
+                error: 'Favourite not found' 
+            });
+        }
+
+        res.json({
+            message: 'Favourite removed successfully',
+            changes: result.changes
+        });
+    } catch (error) {
+        console.error('Delete error:', error);
+        res.status(500).json({ 
+            error: 'Failed to remove favourite',
+            details: error.message 
+        });
+    }
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Total quotes available: ${totalQuotes}`);
     console.log(`Available tags (${availableTags.length}):\n- ${availableTags.join('\n- ')}`);
