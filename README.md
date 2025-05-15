@@ -87,11 +87,6 @@ Luke (@empafee)
 
 Mike(@BieningMike)
 
-# 📸Screenshot
-
-Here's a picture of what the website looks like:
-
-![image](https://github.com/user-attachments/assets/60449df9-679c-475e-8a18-3f695cc9835c)
 
 # 📄License
 
