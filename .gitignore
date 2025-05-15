@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 node_modules/
 (OG Server.js)
 const express = require('express');
@@ -50,3 +51,7 @@ app.listen(PORT, () => {
     { "quote": "To know oneself is to study oneself in action with another person.", "author": "Bruce Lee", "category": "inspirational" },
     { "quote": "Power comes in response to a need, not a desire.", "author": "Goku", "category": "anime" }
 ]
+=======
+node_modules
+*.db
+>>>>>>> e7c96cae556c2a726309e1290d699576ec3e5656

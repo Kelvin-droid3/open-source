@@ -1,151 +1,23 @@
 // DOM Elements
-const quoteTextEl = document.getElementById('quoteText');
-const quoteAuthorEl = document.getElementById('quoteAuthor');
-const quoteImageEl = document.getElementById('quoteImage');
+const quoteText = document.getElementById('quoteText');
+const quoteAuthor = document.getElementById('quoteAuthor');
+const quoteTags = document.getElementById('quoteTags');
 const newQuoteBtn = document.getElementById('newQuote');
-const favoriteBtn = document.getElementById('favoriteBtn');
-const copyBtn = document.getElementById('copyBtn');
-const shareBtn = document.getElementById('shareBtn');
-const langSelectEl = document.getElementById('langSelect');
+const favouriteBtn = document.getElementById('favouriteBtn');
 const themeToggleBtn = document.getElementById('themeToggle');
+<<<<<<< HEAD
 const favoritesLinkEl = document.getElementById('favoritesLink');
 const favoritesModalEl = document.getElementById('favoritesModal');
 const closeModalBtn = document.querySelector('.close-modal');
 const favoritesListEl = document.getElementById('favoritesList');
 const categorySelectEl = document.getElementById('categorySelect');
+=======
+const favouritesGrid = document.getElementById('favourites-grid');
+const copyBtn = document.getElementById('copyBtn');
+>>>>>>> d2e31c017f92a18d024bad322313e35f2bdbb47d
 
-// State
-let quotes = [
-    {
-      "text": {
-        "en": "Believe in yourself.",
-        "ja": "自分を信じて。",
-        "fr": "Crois en toi.",
-        "es": "Cree en ti mismo.",
-        "ga": "Creid i dfhéin."
-      },
-      "author": "Unknown",
-      "category": "motivational",
-      "image": "images/0.jpg"
-    },
-    {
-      "text": {
-        "en": "To know oneself is to study oneself in action with another person.",
-        "ja": "自分を知るとは、他人との関わりの中で自分を観察することだ。",
-        "fr": "Se connaître, cest sétudier en action avec une autre personne.",
-        "es": "Conocerse es estudiarse en acción con otra persona.",
-        "ga": "Is é féinfhios a bheith ag staidéar ort féin le duine eile."
-      },
-      "author": "Bruce Lee",
-      "category": "inspirational",
-      "image": "images/1.jpg"
-    },
-    {
-      "text": {
-        "en": "Power comes in response to a need, not a desire.",
-        "ja": "力は欲望ではなく必要に応じて現れる。",
-        "fr": "Le pouvoir vient en réponse à un besoin, pas à un désir.",
-        "es": "El poder surge en respuesta a una necesidad, no a un deseo.",
-        "ga": "Tagann cumhacht mar fhreagra ar riachtanas, ní ar mhian."
-      },
-      "author": "Goku",
-      "category": "anime",
-      "Title": "Dragonball",
-      "image": "images/2.jpg"
-    },
-    {
-      "text": {
-        "en": "Just keep swimming.",
-        "ja": "とにかく泳ぎ続けて。",
-        "fr": "Continue à nager.",
-        "es": "Sigue nadando.",
-        "ga": "Lean ort ag snámh."
-      },
-      "author": "Dory",
-      "category": "movie",
-      "Title": "Finding Nemo",
-      "image": "images/3.jpg"
-    },
-    {
-      "text": {
-        "en": "Why so serious?",
-        "ja": "そんなに真剣になるな。",
-        "fr": "Pourquoi si sérieux ?",
-        "es": "¿Por qué tan serio?",
-        "ga": "Cén fáth chomh dáiríre sin?"
-      },
-      "author": "Joker",
-      "category": "movie",
-      "Title": "Dark Knight(2008)",
-      "image": "images/4.jpg"
-    },
-    {
-      "text": {
-        "en": "I'd rather trust and regret than doubt and regret.",
-        "ja": "疑って後悔するより信じて後悔したい。",
-        "fr": "Je préfère faire confiance et regretter que douter et regretter.",
-        "es": "Prefiero confiar y arrepentirme que dudar y arrepentirme.",
-        "ga": "Is fearr liom muinín agus aiféala ná amhras agus aiféala."
-      },
-      "author": "Kirito",
-      "category": "anime",
-      "Title": "Sword Art Online",
-      "image": "images/5.jpg"
-    },
-    {
-      "text": {
-        "en": "It's over 9000!",
-        "ja": "9000を超えている!",
-        "fr": "Cest plus de 9000 !",
-        "es": "¡Es más de 9000!",
-        "ga": "Tá sé os cionn 9000!"
-      },
-      "author": "Vegeta",
-      "category": "anime",
-      "Title": "Dragonball",
-      "image": "images/6.jpg"
-    },
-    {
-      "text": {
-        "en": "You're gonna be a bridesmaid, but you're never gonna be a bride!",
-        "ja": "あなたは常にブライズメイド、決して花嫁にはならない！",
-        "fr": "Tu seras demoiselle dhonneur, jamais mariée !",
-        "es": "¡Serás dama de honor, pero nunca la novia!",
-        "ga": "Beidh tú i do bhrídeog, ach ní bheidh tú i do bhríde."
-      },
-      "author": "Annie",
-      "category": "movie",
-      "Title": "Bridesmaids (2011)",
-      "image": "images/7.jpg"
-    },
-    {
-      "text": {
-        "en": "I'm not a hero, I'm just a guy who likes to eat.",
-        "ja": "俺はヒーローじゃない。ただ食べるのが好きなだけだ。",
-        "fr": "Je ne suis pas un héros, juste un gars qui aime manger.",
-        "es": "No soy un héroe, solo un tipo que le gusta comer.",
-        "ga": "Ní laoch mé, ach duine a thaitníonn bia leis."
-      },
-      "author": "Goku",
-      "category": "anime",
-      "Title": "Dragonball",
-      "image": "images/8.jpg"
-    },
-    {
-      "text": {
-        "en": "I am not gonna run away, I never go back on my word! That is my nindo: my ninja way.",
-        "ja": "俺は逃げない、言ったことは曲げねえ！それが俺の忍道だ。",
-        "fr": "Je ne fuirai pas et je ne reviendrai jamais sur ma parole ! Cest mon nindo, ma voie ninja.",
-        "es": "¡No voy a huir y nunca me retracto de mi palabra! Ese es mi nindo: mi camino ninja.",
-        "ga": "Ní rithfidh mé agus ní sháróidh mé mo fhocal! Sin é mo bhealach ninja."
-      },
-      "author": "Naruto",
-      "category": "anime",
-      "Title": "Naruto",
-      "image": "images/9.jpg"
-    }
-];
 let currentQuote = {};
+<<<<<<< HEAD
 let currentLang = 'en';
 let currentCategory = 'all'; // New state variable
 let isFavorite = false;
@@ -387,47 +259,223 @@ function changeLanguage(lang) {
 }
 
 // Toggle dark/light theme
+=======
+let isFavourite = false;
+
+// Theme Management
+>>>>>>> d2e31c017f92a18d024bad322313e35f2bdbb47d
 function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
-    updateThemeToggle(newTheme);
+    updateThemeButton(newTheme);
 }
 
-// Update theme toggle button
-function updateThemeToggle(theme) {
-    themeToggleBtn.innerHTML = theme === 'dark' ? 
-        '<i class="fas fa-sun"></i> Light Mode' : 
-        '<i class="fas fa-moon"></i> Dark Mode';
+function updateThemeButton(theme) {
+    if (!themeToggleBtn) return;
+    themeToggleBtn.innerHTML = theme === 'dark' 
+        ? '<i class="fas fa-sun"></i> Light Mode' 
+        : '<i class="fas fa-moon"></i> Dark Mode';
 }
 
-// Toggle favorites modal
-function toggleFavoritesModal() {
-    favoritesModalEl.classList.toggle('hidden');
-    if (!favoritesModalEl.classList.contains('hidden')) {
-        favoritesModalEl.classList.add('show');
-        loadFavorites();
+// Quote Functionality
+async function getRandomQuote() {
+    try {
+        const response = await fetch('http://localhost:3000/random');
+        if (!response.ok) throw new Error('Network error');
+        currentQuote = await response.json();
+        
+        updateDisplay();
+        await checkFavouriteStatus();
+    } catch (error) {
+        console.error('Error:', error);
+        if (quoteText) quoteText.textContent = 'Failed to load quote. Please try again.';
     }
 }
 
-// Show feedback message
+function updateDisplay() {
+    if (!quoteText || !quoteAuthor || !quoteTags) return;
+    
+    quoteText.textContent = `"${currentQuote.quote}"`;
+    quoteAuthor.textContent = `— ${currentQuote.author}`;
+    quoteTags.innerHTML = currentQuote.tags.map(tag => 
+        `<span class="tag">#${tag}</span>`
+    ).join(' ');
+}
+
+// Unified Clipboard Functionality
+function copyQuoteToClipboard(quote, author) {
+    const textToCopy = quote ? `"${quote}" — ${author}` : `"${currentQuote.quote}" — ${currentQuote.author}`;
+    
+    if (!textToCopy || textToCopy === '"undefined" — undefined') {
+        showFeedback('No quote to copy!');
+        return;
+    }
+
+    navigator.clipboard.writeText(textToCopy)
+        .then(() => showFeedback('Quote copied to clipboard!'))
+        .catch(err => {
+            console.error('Copy failed:', err);
+            showFeedback('Failed to copy quote');
+        });
+}
+
+// Favourites Functionality
+async function toggleFavourite(e) {
+    if (e) e.preventDefault();
+    try {
+        const response = await fetch('http://localhost:3000/favourites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                quote: currentQuote.quote,
+                author: currentQuote.author,
+                tags: currentQuote.tags
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to toggle favourite');
+        
+        const result = await response.json();
+        showFeedback(result.message);
+        await checkFavouriteStatus();
+    } catch (error) {
+        console.error('Favourite error:', error);
+        showFeedback('Failed to update favourite');
+    }
+}
+
+async function checkFavouriteStatus() {
+    try {
+        const response = await fetch('http://localhost:3000/favourites');
+        if (!response.ok) throw new Error('Failed to fetch favourites');
+        
+        const favourites = await response.json();
+        isFavourite = favourites.some(fav => 
+            fav.quote === currentQuote.quote && 
+            fav.author === currentQuote.author
+        );
+        
+        if (favouriteBtn) {
+            favouriteBtn.innerHTML = isFavourite 
+                ? '<i class="fas fa-heart"></i> Remove Favourite' 
+                : '<i class="far fa-heart"></i> Add Favourite';
+        }
+    } catch (error) {
+        console.error('Favourite check error:', error);
+    }
+}
+
+async function removeFavourite(quote, author) {
+    try {
+        const response = await fetch('http://localhost:3000/favourites', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quote, author })
+        });
+
+        const responseText = await response.text();
+        if (!response.ok) {
+            let errorMessage = 'Failed to remove favourite';
+            try {
+                const errorData = JSON.parse(responseText);
+                errorMessage = errorData.error || errorMessage;
+            } catch (e) {
+                errorMessage = responseText || errorMessage;
+            }
+            throw new Error(errorMessage);
+        }
+
+        const result = JSON.parse(responseText);
+        showFeedback(result.message);
+        return true;
+    } catch (error) {
+        console.error('Error:', error);
+        showFeedback(error.message);
+        return false;
+    }
+}
+
+async function loadFavourites() {
+    try {
+        const response = await fetch('http://localhost:3000/favourites');
+        if (!response.ok) throw new Error('Failed to load favourites');
+        
+        const favourites = await response.json();
+        if (!favouritesGrid) return;
+
+        favouritesGrid.innerHTML = favourites.length === 0 
+            ? '<p class="empty-state"><i class="fas fa-info-circle"></i> No favourites yet. Add some from the main page!</p>'
+            : favourites.map(quote => `
+                <div class="favourite-card">
+                    <button class="remove-btn action-btn icon" 
+                            data-quote="${encodeURIComponent(quote.quote)}" 
+                            data-author="${encodeURIComponent(quote.author)}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <p class="quote"> "${quote.quote}"</p>
+                    <p class="author">— ${quote.author}</p>
+                    <div class="tags">${(quote.tags || []).map(t => 
+                        `<span class="tag">#${t}</span>`
+                    ).join(' ')}</div>
+                    <div class="favourite-actions-bottom">
+                        <button class="copy-btn action-btn icon" 
+                                data-quote="${encodeURIComponent(quote.quote)}" 
+                                data-author="${encodeURIComponent(quote.author)}"
+                                title="Copy quote">
+                            <i class="far fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+        // Unified copy functionality
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const quote = decodeURIComponent(btn.dataset.quote);
+                const author = decodeURIComponent(btn.dataset.author);
+                copyQuoteToClipboard(quote, author);
+            });
+        });
+
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const card = btn.closest('.favourite-card');
+                const quote = decodeURIComponent(btn.dataset.quote);
+                const author = decodeURIComponent(btn.dataset.author);
+                
+                if (await removeFavourite(quote, author)) {
+                    card.remove();
+                    if (!document.querySelector('.favourite-card')) {
+                        favouritesGrid.innerHTML = '<p class="empty-state"><i class="fas fa-info-circle"></i> No favourites yet. Add some from the main page!</p>';
+                    }
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Error:', error);
+        if (favouritesGrid) {
+            favouritesGrid.innerHTML = `
+                <p class="error-state">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    ${error.message}
+                </p>`;
+        }
+    }
+}
+
+// Helper Functions
 function showFeedback(message) {
     const feedback = document.createElement('div');
     feedback.className = 'feedback';
     feedback.textContent = message;
     document.body.appendChild(feedback);
-    
-    setTimeout(() => {
-        feedback.classList.add('show');
-    }, 10);
-    
-    setTimeout(() => {
-        feedback.classList.remove('show');
-        setTimeout(() => feedback.remove(), 300);
-    }, 2000);
+    setTimeout(() => feedback.remove(), 2000);
 }
 
+<<<<<<< HEAD
 // Set up event listeners
 function setupEventListeners() {
     newQuoteBtn.addEventListener('click', generateQuote);
@@ -459,3 +507,22 @@ function setupEventListeners() {
     });
 }
 
+=======
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeButton(savedTheme);
+
+    if (favouritesGrid) {
+        loadFavourites();
+    } else if (quoteText) {
+        getRandomQuote();
+        newQuoteBtn?.addEventListener('click', getRandomQuote);
+        favouriteBtn?.addEventListener('click', toggleFavourite);
+        copyBtn?.addEventListener('click', () => copyQuoteToClipboard());
+    }
+
+    themeToggleBtn?.addEventListener('click', toggleTheme);
+});
+>>>>>>> d2e31c017f92a18d024bad322313e35f2bdbb47d
