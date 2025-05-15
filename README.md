@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-We are making a Random quote generator
-
-Contributors 
-They are three main contributors to this project and they are: Luke Murphy, Kelvin Agu and Mykhailo Budonnyi
-=======
 ﻿Open Source Project - Quotes R Us
 
 This project is a basic website made with **HTML**, **CSS**, and **JavaScript**.
@@ -76,6 +70,13 @@ git clone [https://github.com/Kelvin-droid3/open-source.git](https://github.com/
 
 ```
 
+2. **Run init-db.js** Run init-db/js in the terminal from the root directory (open-source) with the command "node db/init-db.js" to initialise the database.
+
+3. **Run the quote server** Run "node server.js" in the the terminal from the root directory (open-source) with the command "node server.js" to serve the quotes to the front-end.
+
+4. **Open the index file using Live Extension** Navigate to the Extensions section of VS Code and add "Live Server" if not already added?
+                                                Hover over the "index.html" file, right-click, and then left click on "Open with Live Server". The page will open in a browser tab.
+
 # 👨‍💻Team Members
 
 These are the people who worked on this project:
@@ -95,4 +96,3 @@ Here's a picture of what the website looks like:
 # 📄License
 
 This project has a license called the MIT License. This basically tells other people what they can and can't do with your code. You can find more details about it in a file named `LICENSE`.
->>>>>>> e7c96cae556c2a726309e1290d699576ec3e5656
